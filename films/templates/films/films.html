@@ -1,0 +1,12 @@
+<title>List of checked films</title>
+<body>
+    {% if list_of_checked_films %}
+        <ul>
+        {% for film in list_of_checked_films %}
+            <li><a>{{ film.annotation }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No films are available.</p>
+    {% endif %}
+</body>
