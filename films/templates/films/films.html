@@ -1,8 +1,8 @@
-<title>List of checked films</title>
+<title>List of films</title>
 <body>
-    {% if list_of_checked_films %}
+    {% if list_of_films %}
         <ul>
-        {% for film in list_of_checked_films %}
+        {% for film in list_of_films %}
             <li><a>{{ film.annotation }}</a></li>
         {% endfor %}
         </ul>
