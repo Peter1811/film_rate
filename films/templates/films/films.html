@@ -1,12 +1,19 @@
-<title>List of films</title>
-<body>
+{% extends 'films/base.html' %}
+{% block content %}
+    <body>
     {% if list_of_films %}
         <ul>
-        {% for film in list_of_films %}
-            <li><a>{{ film.annotation }}</a></li>
-        {% endfor %}
+            {% for film in list_of_films %}
+                <li><a>{{ film.name }}</a>
+                    <p>{{ film.annotation }}</p>
+                    {% if film.rating != 0 %}
+                    <p>Рейтинг: {{ film.rating }}</p>
+                    {% endif %}</li>
+
+            {% endfor %}
         </ul>
     {% else %}
-        <p>No films are available.</p>
+        <p>Тут пока ничего нет</p>
     {% endif %}
-</body>
+    </body>
+{% endblock %}

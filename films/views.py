@@ -4,6 +4,8 @@ from django.template import loader
 import films.models
 from .models import Film
 
+menu = ['Популярные фильмы', 'История просмотров', 'Фильмы к просмотру', 'Мой профиль']
+
 
 def handler404(request, exception):
     with open('templates/404.html', 'r') as text_404:
@@ -16,14 +18,16 @@ def handler404(request, exception):
 
 
 def start_page(request):
-    return HttpResponse('<h1>Here will be pipular films')
+    return HttpResponse('<h1>Здесь будут показываться популярные фильмы</h1>')
 
 
 def viewed_films_list(request):
     viewed_films = Film.objects.exclude(rating=0)
     template = loader.get_template('films/films.html')
     context = {
-        'list_of_films': viewed_films
+        'list_of_films': viewed_films,
+        'title': 'История просмотров',
+        'menu': menu
     }
     return HttpResponse(template.render(context, request))
 
@@ -32,7 +36,9 @@ def unseen_list_films(request):
     unseen_films = Film.objects.filter(rating=0)
     template = loader.get_template('films/films.html')
     context = {
-        'list_of_films': unseen_films
+        'list_of_films': unseen_films,
+        'title': 'Фильмы к просмотру',
+        'menu': menu
     }
     return HttpResponse(template.render(context, request))
 
@@ -48,5 +54,3 @@ def film_page(request, film_id):
 
     except films.models.Film.DoesNotExist:
         raise Http404
-
-
