@@ -4,7 +4,7 @@
     {% if list_of_films %}
         <ul>
             {% for film in list_of_films %}
-                <li><a>{{ film.name }}</a>
+                <li><a href="{{ film.get_absolute_url }}">{{ film.name }}</a>
                     <p>{{ film.annotation }}</p>
                     {% if film.rating != 0 %}
                     <p>Рейтинг: {{ film.rating }}</p>

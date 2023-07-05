@@ -23,7 +23,7 @@ def start_page(request):
 
 def viewed_films_list(request):
     viewed_films = Film.objects.exclude(rating=0)
-    template = loader.get_template('films/films.html')
+    template = loader.get_template('films/films_list.html')
     context = {
         'list_of_films': viewed_films,
         'title': 'История просмотров',
@@ -34,7 +34,7 @@ def viewed_films_list(request):
 
 def unseen_list_films(request):
     unseen_films = Film.objects.filter(rating=0)
-    template = loader.get_template('films/films.html')
+    template = loader.get_template('films/films_list.html')
     context = {
         'list_of_films': unseen_films,
         'title': 'Фильмы к просмотру',
@@ -48,7 +48,8 @@ def film_page(request, film_id):
         film = Film.objects.get(id=film_id)
         template = loader.get_template('films/film_page.html')
         context = {
-            'current_film': film
+            'current_film': film,
+            'title': film.name
         }
         return HttpResponse(template.render(context, request))
 
