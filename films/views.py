@@ -1,8 +1,10 @@
-from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
 from django.template import loader
+from django.shortcuts import redirect, render
+from django.views.decorators.csrf import csrf_protect
 
-import films.models
 from .models import Film
+from .forms import FilmCreate
 
 menu = ['Популярные фильмы', 'История просмотров', 'Фильмы к просмотру', 'Мой профиль']
 
@@ -14,10 +16,12 @@ def handler404(request, exception):
     response.status_code = 404
     return response
 
-# Create your views here.
+
+def redirect_root(request):
+    return redirect('/films/')
 
 
-def start_page(request):
+def populars(request):
     return HttpResponse('<h1>Здесь будут показываться популярные фильмы</h1>')
 
 
@@ -53,5 +57,22 @@ def film_page(request, film_id):
         }
         return HttpResponse(template.render(context, request))
 
-    except films.models.Film.DoesNotExist:
+    except Film.DoesNotExist:
         raise Http404
+
+
+@csrf_protect
+def add_film(request):
+    if request.method == 'POST':
+        form = FilmCreate(request.POST)
+        if form.is_valid():
+            created_film = Film()
+            for field in form.cleaned_data:
+                setattr(created_film, field, form.cleaned_data[field])
+            created_film.save()
+            return HttpResponseRedirect(f'/films/{created_film.id}')
+
+    else:
+        form = FilmCreate()
+
+    return render(request, 'films/add_film.html', {"form": form})

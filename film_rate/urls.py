@@ -19,8 +19,7 @@ from django.urls import path, include
 from django.shortcuts import redirect
 
 
-def redirect_root(request):
-    return redirect('/films/')
+from films.views import redirect_root
 
 
 urlpatterns = [
