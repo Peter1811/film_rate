@@ -1,6 +1,7 @@
 {% extends 'films/base.html' %}
 {% block content %}
     <body>
+    <h1>{{ title }}</h1>
     {% if list_of_films %}
         <ul>
             {% for film in list_of_films %}

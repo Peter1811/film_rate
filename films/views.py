@@ -2,11 +2,20 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpRespons
 from django.template import loader
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_protect
+import os
 
 from .models import Film
 from .forms import FilmCreate
 
-menu = ['Популярные фильмы', 'История просмотров', 'Фильмы к просмотру', 'Мой профиль']
+menu = {'Популярные фильмы': '/popular',
+        'История просмотров': '/viewed',
+        'Фильмы к просмотру': '/to-watch',
+        'Добавить фильм': '/add-film',
+        'Мой профиль': '/my-profile'}
+
+prefix = os.getenv('API_STR')
+for item in menu:
+    menu[item] = prefix + menu[item]
 
 
 def handler404(request, exception):
@@ -21,8 +30,26 @@ def redirect_root(request):
     return redirect('/films/')
 
 
-def populars(request):
-    return HttpResponse('<h1>Здесь будут показываться популярные фильмы</h1>')
+def main_page(request):
+    return HttpResponse('<h1>Главная страница сайта</h1>')
+
+
+def popular(request):
+    template = loader.get_template('films/popular.html')
+    context = {
+        'title': 'Популярные фильмы',
+        'menu': menu
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def my_profile_page(request):
+    template = loader.get_template('films/my_profile.html')
+    context = {
+        'title': 'Мой профиль',
+        'menu': menu
+    }
+    return HttpResponse(template.render(context, request))
 
 
 def viewed_films_list(request):
@@ -53,7 +80,8 @@ def film_page(request, film_id):
         template = loader.get_template('films/film_page.html')
         context = {
             'current_film': film,
-            'title': film.name
+            'title': film.name,
+            'menu': menu
         }
         return HttpResponse(template.render(context, request))
 
@@ -70,7 +98,7 @@ def add_film(request):
             for field in form.cleaned_data:
                 setattr(created_film, field, form.cleaned_data[field])
             created_film.save()
-            return HttpResponseRedirect(f'/films/{created_film.id}')
+            return HttpResponseRedirect(f'{created_film.get_absolute_url()}')
 
     else:
         form = FilmCreate()

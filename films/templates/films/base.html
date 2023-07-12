@@ -7,8 +7,8 @@
 <body>
 {% block mainmenu %}
     <ul>
-        {% for item in menu %}
-            <li>{{ item }}</li>
+        {% for item, ref in menu.items %}
+            <li><a href="{{ ref }}">{{ item }}</a></li>
         {% endfor %}
     </ul>
 {% endblock mainmenu %}
