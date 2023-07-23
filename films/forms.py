@@ -1,8 +1,16 @@
-from django import forms
+from django.forms import ModelForm
+from .models import Film
 
 
-class FilmCreate(forms.Form):
-    name = forms.CharField(label='Название фильма', max_length=50)
-    genre = forms.CharField(label='Жанр фильма', max_length=50)
-    annotation = forms.CharField(label='Краткое описание фильма', widget=forms.Textarea, max_length=500)
-    rating = forms.FloatField(label='Рейтинг фильма')
+class FilmForm(ModelForm):
+    class Meta:
+        model = Film
+        fields = '__all__'
+
+        labels = {
+            'name': 'Название фильма',
+            'genre': 'Жанр фильма',
+            'annotation': 'Краткое описание',
+            'rating': 'Рейтинг',
+            'poster': 'Постер к фильму'
+        }

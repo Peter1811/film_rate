@@ -1,13 +1,15 @@
-from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.template import loader
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_protect
+from django.views.generic import CreateView
+from django.core.files.storage import FileSystemStorage
 import os
 
 from .models import Film
-from .forms import FilmCreate
+from .forms import FilmForm
 
-menu = {'Популярные фильмы': '/popular',
+menu = {'Популярные фильмы': '',
         'История просмотров': '/viewed',
         'Фильмы к просмотру': '/to-watch',
         'Добавить фильм': '/add-film',
@@ -16,6 +18,14 @@ menu = {'Популярные фильмы': '/popular',
 prefix = os.getenv('API_STR')
 for item in menu:
     menu[item] = prefix + menu[item]
+
+
+class FilmCreate(CreateView):
+    model = Film
+    form_class = FilmForm
+    extra_context = {}
+    template_name = 'films/add_film.html'
+    success_url = '/films'
 
 
 def handler404(request, exception):
@@ -28,10 +38,6 @@ def handler404(request, exception):
 
 def redirect_root(request):
     return redirect('/films/')
-
-
-def main_page(request):
-    return HttpResponse('<h1>Главная страница сайта</h1>')
 
 
 def popular(request):
@@ -91,16 +97,17 @@ def film_page(request, film_id):
 
 @csrf_protect
 def add_film(request):
-    if request.method == 'POST':
-        form = FilmCreate(request.POST)
-        if form.is_valid():
-            created_film = Film()
-            for field in form.cleaned_data:
-                setattr(created_film, field, form.cleaned_data[field])
-            created_film.save()
-            return HttpResponseRedirect(f'{created_film.get_absolute_url()}')
+    template = loader.get_template('films/add_film.html')
+    context = {
+        'title': 'Добавление фильма',
+        'menu': menu
+    }
+    if request.method == 'POST' and request.FILES:
+        file = request.FILES['film_poster']
+        fs = FileSystemStorage()
+        filename = fs.save(file.name, file)
+        film_url = fs.url(filename)
+        context['film_url'] = film_url
+        return HttpResponse(template.render(context, request))
 
-    else:
-        form = FilmCreate()
-
-    return render(request, 'films/add_film.html', {"form": form})
+    return HttpResponse(template.render(context, request))

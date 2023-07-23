@@ -2,7 +2,9 @@
 {% block content %}
 <body>
     <p>{{ current_film.name }}</p>
-    <p>{{ current_film.photo }}</p>
+    <p>
+        <img src="{{ current_film.poster.url }}" width="300" height="330">
+    </p>
 </body>
 {% endblock %}
 
