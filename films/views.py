@@ -28,10 +28,10 @@ class FilmCreate(CreateView):
     success_url = '/films'
 
     def get_context_data(self, **kwargs):
-        ctx = super(FilmCreate, self).get_context_data(**kwargs)
-        ctx['title'] = 'Добавить фильм'
-        ctx['menu'] = menu
-        return ctx
+        context = super(FilmCreate, self).get_context_data(**kwargs)
+        context['title'] = 'Добавить фильм'
+        context['menu'] = menu
+        return context
 
 
 def handler404(request, exception):
@@ -106,8 +106,7 @@ def add_film(request):
     if request.method == 'POST' and request.FILES:
         file = request.FILES['film_poster']
         fs = FileSystemStorage()
-        filename = fs.save(file.name, file)
-        film_url = fs.url(filename)
+        fs.save(file.name, file)
         return render(request, 'films/add_film.html')
 
     return render(request, 'films/add_film.html')
