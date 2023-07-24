@@ -1,6 +1,10 @@
 annotated-types==0.5.0
 asgiref==3.7.2
+bootstrap4==0.1.0
+crispy-bootstrap4==2022.1
 Django==4.2.2
+django-crispy-forms==2.0
+Pillow==10.0.0
 psycopg2==2.9.6
 pydantic==2.0
 pydantic_core==2.0.1
