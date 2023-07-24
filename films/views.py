@@ -1,9 +1,9 @@
+from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.shortcuts import redirect, render
 from django.template import loader
-from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import CreateView
-from django.core.files.storage import FileSystemStorage
 import os
 
 from .models import Film
@@ -26,6 +26,12 @@ class FilmCreate(CreateView):
     extra_context = {}
     template_name = 'films/add_film.html'
     success_url = '/films'
+
+    def get_context_data(self, **kwargs):
+        ctx = super(FilmCreate, self).get_context_data(**kwargs)
+        ctx['title'] = 'Добавить фильм'
+        ctx['menu'] = menu
+        return ctx
 
 
 def handler404(request, exception):
@@ -97,17 +103,11 @@ def film_page(request, film_id):
 
 @csrf_protect
 def add_film(request):
-    template = loader.get_template('films/add_film.html')
-    context = {
-        'title': 'Добавление фильма',
-        'menu': menu
-    }
     if request.method == 'POST' and request.FILES:
         file = request.FILES['film_poster']
         fs = FileSystemStorage()
         filename = fs.save(file.name, file)
         film_url = fs.url(filename)
-        context['film_url'] = film_url
-        return HttpResponse(template.render(context, request))
+        return render(request, 'films/add_film.html')
 
-    return HttpResponse(template.render(context, request))
+    return render(request, 'films/add_film.html')

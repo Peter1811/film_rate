@@ -6,6 +6,7 @@
         <ul>
             {% for film in list_of_films %}
                 <li><a href="{{ film.get_absolute_url }}">{{ film.name }}</a>
+                    <p><img src="{{ film.poster.url }}" width="200" height="220"></p>
                     <p>{{ film.annotation }}</p>
                     {% if film.rating != 0 %}
                     <p>Рейтинг: {{ film.rating }}</p>
