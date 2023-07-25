@@ -10,5 +10,5 @@ urlpatterns = [
     path('viewed/', views.viewed_films_list, name='viewed'),
     path('to-watch/', views.unseen_list_films, name='to_watch'),
     path('<int:film_id>/', views.film_page, name='film_id'),
-    path('add-film/', views.FilmCreate.as_view(), name='add_film')
+    path('add-film/', views.add_film, name='add_film')
 ]

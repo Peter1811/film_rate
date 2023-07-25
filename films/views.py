@@ -7,7 +7,7 @@ from django.views.generic import CreateView
 import os
 
 from .models import Film
-from .forms import FilmForm
+from .forms import FilmForm, genres
 
 menu = {'Популярные фильмы': '',
         'История просмотров': '/viewed',
@@ -70,7 +70,8 @@ def viewed_films_list(request):
     context = {
         'list_of_films': viewed_films,
         'title': 'История просмотров',
-        'menu': menu
+        'menu': menu,
+        'genres': genres
     }
     return HttpResponse(template.render(context, request))
 
@@ -81,7 +82,8 @@ def unseen_list_films(request):
     context = {
         'list_of_films': unseen_films,
         'title': 'Фильмы к просмотру',
-        'menu': menu
+        'menu': menu,
+        'genres': genres
     }
     return HttpResponse(template.render(context, request))
 
@@ -104,9 +106,11 @@ def film_page(request, film_id):
 @csrf_protect
 def add_film(request):
     if request.method == 'POST' and request.FILES:
-        file = request.FILES['film_poster']
-        fs = FileSystemStorage()
-        fs.save(file.name, file)
-        return render(request, 'films/add_film.html')
+        form = FilmForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('to_watch')
+    else:
+        form = FilmForm()
 
-    return render(request, 'films/add_film.html')
+    return render(request, 'films/add_film.html', {'menu': menu, 'title': 'Добавить фильм', 'form': form})

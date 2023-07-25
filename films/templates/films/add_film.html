@@ -1,10 +1,14 @@
 {% extends 'films/base.html' %}
-{% load crispy_forms_tags %}
 {% block content %}
     <h1>Здесь можно добавить новый фильм</h1>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form|crispy }}
+        <div class="form-error">{{ form.non_field_errors }}</div>
+        {% for field in form %}
+            <p><label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}: </label>{{ field }}
+            </p>
+            <div class="form-error">{{ field.errors }}</div>
+        {% endfor %}
         <button type="submit">Загрузить</button>
     </form>
 {% endblock %}

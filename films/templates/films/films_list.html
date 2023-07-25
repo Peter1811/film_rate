@@ -2,6 +2,16 @@
 {% block content %}
     <body>
     <h1>{{ title }}</h1>
+    <h2>Выберите жанр</h2>
+    <div>
+        {% for genre in genres %}
+            <input type="radio" name="genre" value={{ genre }}>
+            <label>{{ genre }}</label>
+        {% endfor %}
+    </div>
+    <div>
+        <button type="submit">Выбрать</button>
+    </div>
     {% if list_of_films %}
         <ul>
             {% for film in list_of_films %}
@@ -9,7 +19,7 @@
                     <p><img src="{{ film.poster.url }}" width="200" height="220"></p>
                     <p>{{ film.annotation }}</p>
                     {% if film.rating != 0 %}
-                    <p>Рейтинг: {{ film.rating }}</p>
+                        <p>Рейтинг: {{ film.rating }}</p>
                     {% endif %}</li>
 
             {% endfor %}

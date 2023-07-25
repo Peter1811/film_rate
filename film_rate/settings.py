@@ -39,12 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'films.apps.FilmsConfig',
-    'crispy_forms',
-    'crispy_bootstrap4'
+    'films.apps.FilmsConfig'
 ]
-
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
