@@ -3,15 +3,18 @@
     <body>
     <h1>{{ title }}</h1>
     <h2>Выберите жанр</h2>
-    <div>
-        {% for genre in genres %}
-            <input type="radio" name="genre" value={{ genre }}>
-            <label>{{ genre }}</label>
-        {% endfor %}
-    </div>
-    <div>
-        <button type="submit">Выбрать</button>
-    </div>
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            {% for genre in genres %}
+                <label for="{{ genre }}"></label>
+                <input type="radio" id="{{ genre }}" name="genre" value={{ genre }}>{{ genre }}
+            {% endfor %}
+        </div>
+        <p>
+            <button type="submit">Выбрать</button>
+        </p>
+    </form>
     {% if list_of_films %}
         <ul>
             {% for film in list_of_films %}

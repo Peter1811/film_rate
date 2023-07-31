@@ -1,9 +1,8 @@
-from django.core.files.storage import FileSystemStorage
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import redirect, render
 from django.template import loader
 from django.views.decorators.csrf import csrf_protect
-from django.views.generic import CreateView
 import os
 
 from .models import Film
@@ -18,20 +17,6 @@ menu = {'Популярные фильмы': '',
 prefix = os.getenv('API_STR')
 for item in menu:
     menu[item] = prefix + menu[item]
-
-
-class FilmCreate(CreateView):
-    model = Film
-    form_class = FilmForm
-    extra_context = {}
-    template_name = 'films/add_film.html'
-    success_url = '/films'
-
-    def get_context_data(self, **kwargs):
-        context = super(FilmCreate, self).get_context_data(**kwargs)
-        context['title'] = 'Добавить фильм'
-        context['menu'] = menu
-        return context
 
 
 def handler404(request, exception):
@@ -64,28 +49,38 @@ def my_profile_page(request):
     return HttpResponse(template.render(context, request))
 
 
+@csrf_protect
 def viewed_films_list(request):
-    viewed_films = Film.objects.exclude(rating=0)
-    template = loader.get_template('films/films_list.html')
     context = {
-        'list_of_films': viewed_films,
         'title': 'История просмотров',
         'menu': menu,
         'genres': genres
     }
-    return HttpResponse(template.render(context, request))
+    if request.method == 'POST':
+        genre = request.POST.get('genre')
+        context['list_of_films'] = Film.objects.filter(Q(genre=genre) & ~Q(rating=0))
+        return render(request, 'films/films_list.html', context=context)
+
+    context['list_of_films'] = Film.objects.filter(~Q(rating=0))
+
+    return render(request, 'films/films_list.html', context=context)
 
 
+@csrf_protect
 def unseen_list_films(request):
-    unseen_films = Film.objects.filter(rating=0)
-    template = loader.get_template('films/films_list.html')
     context = {
-        'list_of_films': unseen_films,
         'title': 'Фильмы к просмотру',
         'menu': menu,
         'genres': genres
     }
-    return HttpResponse(template.render(context, request))
+    if request.method == 'POST':
+        genre = request.POST.get('genre')
+        context['list_of_films'] = Film.objects.filter(Q(genre=genre) & Q(rating=0))
+        return render(request, 'films/films_list.html', context=context)
+
+    context['list_of_films'] = Film.objects.filter(rating=0)
+
+    return render(request, 'films/films_list.html', context=context)
 
 
 def film_page(request, film_id):
@@ -109,8 +104,10 @@ def add_film(request):
         form = FilmForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('to_watch')
+            film_id = Film.objects.last().id
+            return redirect('film_id', film_id)
     else:
         form = FilmForm()
 
-    return render(request, 'films/add_film.html', {'menu': menu, 'title': 'Добавить фильм', 'form': form})
+    return render(request, 'films/add_film.html',
+                  {'menu': menu, 'title': 'Добавить фильм', 'form': form, 'genres': genres})
