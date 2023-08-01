@@ -3,7 +3,7 @@ from django import forms
 
 from .models import Film
 
-genres = ['Боевик', 'Комедия', 'Ужасы', 'Хоррор', 'Триллер', 'Фэнтези', 'Семейный', 'Приключения']
+genres = ['боевик', 'комедия', 'ужасы', 'хоррор', 'триллер', 'фэнтези', 'семейный', 'приключения']
 
 
 class FilmForm(forms.ModelForm):

@@ -4,8 +4,9 @@ from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_protect
 import os
 
-from .models import Film
 from .forms import FilmForm, genres
+from .models import Film
+from .utils import context_replenishment_for_film_list_views
 
 menu = {'Популярные фильмы': '',
         'История просмотров': '/viewed',
@@ -47,37 +48,33 @@ def my_profile_page(request):
 
 
 @csrf_protect
-def viewed_films_list(request):
+def film_list(request, film_list_slug):
     context = {
-        'title': 'История просмотров',
         'menu': menu,
         'genres': genres
     }
     if request.method == 'POST':
         genre = request.POST.get('genre')
-        context['list_of_films'] = Film.objects.filter(Q(genre=genre) & ~Q(rating=0))
-        context['requested_genre'] = genre
+        if not genre:
+            values = {
+                'viewed': Film.objects.filter(~Q(rating=0)),
+                'to-watch': Film.objects.filter(rating=0),
+            }
+            context_replenishment_for_film_list_views(slug=film_list_slug, context=context, values=values)
+        else:
+            context['requested_genre'] = genre
+            values = {
+                'viewed': Film.objects.filter(Q(genre=genre) & ~Q(rating=0)),
+                'to-watch': Film.objects.filter(Q(genre=genre) & Q(rating=0)),
+            }
+            context_replenishment_for_film_list_views(slug=film_list_slug, context=context, values=values)
         return render(request, 'films/films_list.html', context=context)
 
-    context['list_of_films'] = Film.objects.filter(~Q(rating=0))
-
-    return render(request, 'films/films_list.html', context=context)
-
-
-@csrf_protect
-def unseen_list_films(request):
-    context = {
-        'title': 'Фильмы к просмотру',
-        'menu': menu,
-        'genres': genres
+    values = {
+        'viewed': Film.objects.filter(~Q(rating=0)),
+        'to-watch': Film.objects.filter(rating=0),
     }
-    if request.method == 'POST':
-        genre = request.POST.get('genre')
-        context['list_of_films'] = Film.objects.filter(Q(genre=genre) & Q(rating=0))
-        context['requested_genre'] = genre
-        return render(request, 'films/films_list.html', context=context)
-
-    context['list_of_films'] = Film.objects.filter(rating=0)
+    context_replenishment_for_film_list_views(slug=film_list_slug, context=context, values=values)
 
     return render(request, 'films/films_list.html', context=context)
 
