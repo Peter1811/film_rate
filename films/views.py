@@ -1,7 +1,6 @@
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.http import HttpResponseNotFound, Http404
 from django.shortcuts import redirect, render
-from django.template import loader
 from django.views.decorators.csrf import csrf_protect
 import os
 
@@ -32,21 +31,19 @@ def redirect_root(request):
 
 
 def popular(request):
-    template = loader.get_template('films/popular.html')
     context = {
         'title': 'Популярные фильмы',
         'menu': menu
     }
-    return HttpResponse(template.render(context, request))
+    return render(request, 'films/popular.html', context=context)
 
 
 def my_profile_page(request):
-    template = loader.get_template('films/my_profile.html')
     context = {
         'title': 'Мой профиль',
         'menu': menu
     }
-    return HttpResponse(template.render(context, request))
+    return render(request, 'films/my_profile.html', context=context)
 
 
 @csrf_protect
@@ -59,6 +56,7 @@ def viewed_films_list(request):
     if request.method == 'POST':
         genre = request.POST.get('genre')
         context['list_of_films'] = Film.objects.filter(Q(genre=genre) & ~Q(rating=0))
+        context['requested_genre'] = genre
         return render(request, 'films/films_list.html', context=context)
 
     context['list_of_films'] = Film.objects.filter(~Q(rating=0))
@@ -76,6 +74,7 @@ def unseen_list_films(request):
     if request.method == 'POST':
         genre = request.POST.get('genre')
         context['list_of_films'] = Film.objects.filter(Q(genre=genre) & Q(rating=0))
+        context['requested_genre'] = genre
         return render(request, 'films/films_list.html', context=context)
 
     context['list_of_films'] = Film.objects.filter(rating=0)
@@ -86,13 +85,12 @@ def unseen_list_films(request):
 def film_page(request, film_id):
     try:
         film = Film.objects.get(id=film_id)
-        template = loader.get_template('films/film_page.html')
         context = {
             'current_film': film,
             'title': film.name,
             'menu': menu
         }
-        return HttpResponse(template.render(context, request))
+        return render(request, 'films/film_page.html', context=context)
 
     except Film.DoesNotExist:
         raise Http404

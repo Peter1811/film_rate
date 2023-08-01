@@ -1,13 +1,23 @@
 {% extends 'films/base.html' %}
 {% block content %}
-    <h1>Здесь можно добавить новый фильм</h1>
+    <h1 align="center">Здесь можно добавить новый фильм</h1>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-error">{{ form.non_field_errors }}</div>
         {% for field in form %}
-            <p><label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}: </label>{{ field }}
-            </p>
-            <div class="form-error">{{ field.errors }}</div>
+            {% if field.label != "Жанр фильма" %}
+                <p><label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}: </label>{{ field }}
+                </p>
+                <div class="form-error">{{ field.errors }}</div>
+            {% else %}
+                <p>{{ field.label }}:
+                    {% for genre in genres %}
+                        <input type="radio" id="{{ genre }}" name="genre" value={{ genre }}>
+                        <label for="{{ genre }}">{{ genre }}</label>
+                    {% endfor %}
+                <div class="form-error">{{ field.errors }}</div>
+                </p>
+            {% endif %}
         {% endfor %}
         <button type="submit">Загрузить</button>
     </form>

@@ -22,16 +22,12 @@ class FilmForm(forms.ModelForm):
             'annotation': forms.Textarea(attrs={'cols': 50, 'rows': 7}),
         }
 
-    def clean_genre(self):
-        genre = self.cleaned_data['genre']
-        if genre.lower() not in [_.lower() for _ in genres]:
-            raise ValidationError(
-                'Такого жанра нет в списке, доступные жанры: ' + ', '.join([_.lower() for _ in genres]))
-        return genre
+    def __init__(self, *args, **kwargs):
+        super(FilmForm, self).__init__(*args, **kwargs)
+        self.fields['genre'].error_messages = {'required': 'Необходимо выбрать жанр'}
 
     def clean_rating(self):
         rating = self.cleaned_data['rating']
         if rating < 0 or rating > 10:
             raise ValidationError('Неверный рейтинг, ожидается значение от 0 (фильм не просмотрен) до 10')
         return rating
-
