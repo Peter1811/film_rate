@@ -5,14 +5,34 @@
     <meta charset="UTF-8">
     <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-ico">
     <title> {{ title }}</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </head>
 <body>
 {% block mainmenu %}
-    <ul>
-        {% for item, ref in menu.items %}
-            <li><a href="{{ ref }}">{{ item }}</a></li>
-        {% endfor %}
+<div class="dropdown">
+  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+    Выберите вариант
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <li><a class="dropdown-item" href="#">Вариант 1</a></li>
+    <li><a class="dropdown-item" href="#">Вариант 2</a></li>
+    <li><a class="dropdown-item" href="#">Вариант 3</a></li>
+  </ul>
+</div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <ul class="nav nav-fill w-100">
+      {% for item, ref in menu.items %}
+        <li class="nav-item flex-fill">
+          <a class="nav-link text-light" href="{{ ref }}">
+            {{ item }}
+          </a>
+        </li>
+      {% endfor %}
     </ul>
+  </div>
+</nav>
 {% endblock mainmenu %}
 {% block content %}
 {% endblock %}

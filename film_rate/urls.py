@@ -23,7 +23,7 @@ from films.views import redirect_root
 
 
 urlpatterns = [
-    path('', redirect_root),
-    path('films/', include('films.urls')),
+    # path('', redirect_root),
+    path('', include('films.urls')),
     path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -14,9 +14,9 @@ menu = {'Популярные фильмы': '',
         'Добавить фильм': '/add-film',
         'Мой профиль': '/my-profile'}
 
-prefix = os.getenv('API_STR')
-for item in menu:
-    menu[item] = prefix + menu[item]
+# prefix = os.getenv('API_STR')
+# for item in menu:
+#     menu[item] = prefix + menu[item]
 
 
 def handler404(request, exception):
