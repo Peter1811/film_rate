@@ -1,9 +1,17 @@
-from django.core.exceptions import ValidationError
 from django import forms
 
 from .models import Film
 
-genres = ['боевик', 'комедия', 'ужасы', 'хоррор', 'триллер', 'фэнтези', 'семейный', 'приключения']
+genres = [
+    'боевик', 
+    'комедия', 
+    'ужасы', 
+    'хоррор', 
+    'триллер', 
+    'фэнтези', 
+    'семейный', 
+    'приключения'
+]
 
 
 class FilmForm(forms.ModelForm):
@@ -24,10 +32,7 @@ class FilmForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FilmForm, self).__init__(*args, **kwargs)
-        self.fields['genre'].error_messages = {'required': 'Необходимо выбрать жанр'}
-
-    def clean_rating(self):
-        rating = self.cleaned_data['rating']
-        if rating < 0 or rating > 10:
-            raise ValidationError('Неверный рейтинг, ожидается значение от 0 (фильм не просмотрен) до 10')
-        return rating
+        self.fields['genre'].choices = [(genre, genre) for genre in genres]
+        self.fields['genre'].error_messages = {
+            'required': 'Необходимо выбрать жанр'
+        }

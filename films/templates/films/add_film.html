@@ -1,24 +1,66 @@
 {% extends 'films/base.html' %}
+
+{% load widget_tweaks %}
 {% block content %}
-    <h1 align="center">Здесь можно добавить новый фильм</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="form-error">{{ form.non_field_errors }}</div>
-        {% for field in form %}
-            {% if field.label != "Жанр фильма" %}
-                <p><label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}: </label>{{ field }}
-                </p>
-                <div class="form-error">{{ field.errors }}</div>
-            {% else %}
-                <p>{{ field.label }}:
-                    {% for genre in genres %}
-                        <input type="radio" id="{{ genre }}" name="genre" value={{ genre }}>
-                        <label for="{{ genre }}">{{ genre }}</label>
-                    {% endfor %}
-                <div class="form-error">{{ field.errors }}</div>
-                </p>
-            {% endif %}
-        {% endfor %}
-        <button type="submit">Загрузить</button>
-    </form>
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg rounded-4">
+        <div class="card-header bg-primary text-white text-center">
+          <h4 class="mb-0">Добавить новый фильм</h4>
+        </div>
+        <div class="card-body bg-light">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-error">{{ form.non_field_errors }}</div>
+
+            <!-- Название -->
+            <div class="mb-3">
+              <label class="form-label">{{ form.name.label }}</label>
+              {% render_field form.name class="form-control" placeholder="Введите название" %}
+              <div class="form-error text-danger small">{{ form.name.errors }}</div>
+            </div>
+
+            <!-- Жанр -->
+            <div class="mb-3">
+              <label class="form-label">{{ form.genre.label }}</label>
+              <select class="form-select" name="genre" id="genre">
+                  {% for genre in genres %}
+                      <option value="{{ genre }}">{{ genre }}</option>
+                  {% endfor %}
+              </select>
+              <div class="form-error text-danger small">{{ form.genre.errors }}</div>
+            </div>
+
+            <!-- Описание -->
+            <div class="mb-3">
+              <label class="form-label">{{ form.annotation.label }}</label>
+              {% render_field form.annotation class="form-control" rows="5" %}
+              <div class="form-error text-danger small">{{ form.annotation.errors }}</div>
+            </div>
+
+            <!-- Рейтинг -->
+            <div class="mb-3">
+              <label class="form-label">{{ form.rating.label }}</label>
+              {% render_field form.rating class="form-control" %}
+              <div class="form-error text-danger small">{{ form.rating.errors }}</div>
+            </div>
+
+            <!-- Постер -->
+            <div class="mb-3">
+              <label class="form-label">{{ form.poster.label }}</label>
+              {% render_field form.poster class="form-control" %}
+              <div class="form-error text-danger small">{{ form.poster.errors }}</div>
+            </div>
+
+            <!-- Кнопка -->
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary px-4">Сохранить</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

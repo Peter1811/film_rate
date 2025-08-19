@@ -12,7 +12,7 @@ class Film(models.Model):
     genre = models.CharField(max_length=50)
     annotation = models.TextField(max_length=500)
     rating = models.FloatField(default=0.0)
-    poster = models.ImageField(default='C:/Users/Peter/Desktop/film_rate/media/1.jpg', upload_to='posters/')
+    poster = models.ImageField(upload_to='posters/')
 
     def __str__(self):
         return self.name + ", " + self.genre.lower()

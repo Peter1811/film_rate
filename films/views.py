@@ -1,25 +1,22 @@
 from django.db.models import Q
-from django.http import HttpResponseNotFound, Http404
+from django.http import HttpResponseNotFound, Http404, HttpRequest
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_protect
 import os
 
 from .forms import FilmForm, genres
 from .models import Film
-from .utils import context_replenishment_for_film_list_views
 
-menu = {'Популярные фильмы': '',
-        'История просмотров': '/viewed',
-        'Фильмы к просмотру': '/to-watch',
-        'Добавить фильм': '/add-film',
-        'Мой профиль': '/my-profile'}
-
-# prefix = os.getenv('API_STR')
-# for item in menu:
-#     menu[item] = prefix + menu[item]
+menu = {
+    'Популярные фильмы': '/popular',
+    'История просмотров': '/watched',
+    'Фильмы к просмотру': '/to-watch',
+    'Добавить фильм': '/add-film',
+    'Мой профиль': '/my-profile'
+}
 
 
-def handler404(request, exception):
+def handler404(request: HttpRequest, exception):
     with open('templates/404.html', 'r') as text_404:
         text = text_404.read()
     response = HttpResponseNotFound(request, content=text)
@@ -27,11 +24,11 @@ def handler404(request, exception):
     return response
 
 
-def redirect_root(request):
-    return redirect('/films/')
+def redirect_root(request: HttpRequest):
+    return redirect('/popular/')
 
 
-def popular(request):
+def popular(request: HttpRequest):
     context = {
         'title': 'Популярные фильмы',
         'menu': menu
@@ -48,38 +45,75 @@ def my_profile_page(request):
 
 
 @csrf_protect
-def film_list(request, film_list_slug):
+def film_list(request: HttpRequest):
+    '''
+    Получение списка фильмов - либо просмотренных, либо запланированных
+    к просмотру (в зависимости от path).
+
+    :param request: передаваемый запрос.
+    '''
+
     context = {
         'menu': menu,
         'genres': genres
     }
+    path = request.path
+    if path == '/watched/':
+        pass
+    elif path == '/to-watch/':
+        pass
+    
     if request.method == 'POST':
         genre = request.POST.get('genre')
         if not genre:
-            values = {
-                'viewed': Film.objects.filter(~Q(rating=0)),
-                'to-watch': Film.objects.filter(rating=0),
-            }
-            context_replenishment_for_film_list_views(slug=film_list_slug, context=context, values=values)
+            if path == '/watched/':
+                context['list_of_films'] = Film.objects.filter(
+                    ~Q(rating=0)
+                )
+                context['title'] = 'Просмотрено'
+            elif path == '/to-watch/':
+                context['list_of_films'] = Film.objects.filter(
+                    Q(rating=0)
+                )
+                context['title'] = 'Запланировано к просмотру'
+
         else:
             context['requested_genre'] = genre
-            values = {
-                'viewed': Film.objects.filter(Q(genre=genre) & ~Q(rating=0)),
-                'to-watch': Film.objects.filter(Q(genre=genre) & Q(rating=0)),
-            }
-            context_replenishment_for_film_list_views(slug=film_list_slug, context=context, values=values)
+            if path == '/watched/':
+                context['list_of_films'] = Film.objects.filter(
+                    Q(genre=genre) & ~Q(rating=0)
+                )
+                context['title'] = 'Просмотрено'
+            elif path == '/to-watch/':
+                context['list_of_films'] = Film.objects.filter(
+                    Q(genre=genre) & Q(rating=0)
+                )
+                context['title'] = 'Запланировано к просмотру'
+
         return render(request, 'films/films_list.html', context=context)
 
-    values = {
-        'viewed': Film.objects.filter(~Q(rating=0)),
-        'to-watch': Film.objects.filter(rating=0),
-    }
-    context_replenishment_for_film_list_views(slug=film_list_slug, context=context, values=values)
+    if path == '/watched/':
+        context['list_of_films'] = Film.objects.filter(~Q(rating=0))
+        context['title'] = 'Просмотрено'
+    elif path == '/to-watch/':
+        context['list_of_films'] = Film.objects.filter(Q(rating=0))
+        context['title'] = 'Запланировано к просмотру'
 
-    return render(request, 'films/films_list.html', context=context)
+    return render(
+        request, 
+        'films/films_list.html', 
+        context=context
+    )
 
 
-def film_page(request, film_id):
+def film_page(request: HttpRequest, film_id: int):
+    '''
+    Страница с данными о фильме.
+
+    :param request: передаваемый запрос;
+    :param film_id: id фильма.
+    '''
+
     try:
         film = Film.objects.get(id=film_id)
         context = {
@@ -87,14 +121,30 @@ def film_page(request, film_id):
             'title': film.name,
             'menu': menu
         }
-        return render(request, 'films/film_page.html', context=context)
+        return render(
+            request, 
+            'films/film_page.html', 
+            context=context
+        )
 
     except Film.DoesNotExist:
         raise Http404
 
 
 @csrf_protect
-def add_film(request):
+def add_film(request: HttpRequest):
+    '''
+    Добавление фильма по полям из формы FilmForm.
+
+    :param request: передаваемый запрос.
+    '''
+
+    context = {
+        'menu': menu, 
+        'title': 'Добавить фильм',
+        'genres': genres
+    }
+
     if request.method == 'POST' and request.FILES:
         form = FilmForm(request.POST, request.FILES)
         if form.is_valid():
@@ -104,5 +154,9 @@ def add_film(request):
     else:
         form = FilmForm()
 
-    return render(request, 'films/add_film.html',
-                  {'menu': menu, 'title': 'Добавить фильм', 'form': form, 'genres': genres})
+    context['form'] = form
+    return render(
+        request, 
+        'films/add_film.html',
+        context=context   
+    )
