@@ -8,11 +8,11 @@ from .forms import FilmForm, genres
 from .models import Film
 
 menu = {
-    'Популярные фильмы': '/popular',
+    # 'Популярные фильмы': '/popular',
     'История просмотров': '/watched',
     'Фильмы к просмотру': '/to-watch',
     'Добавить фильм': '/add-film',
-    'Мой профиль': '/my-profile'
+    # 'Мой профиль': '/my-profile'
 }
 
 
@@ -58,14 +58,10 @@ def film_list(request: HttpRequest):
         'genres': genres
     }
     path = request.path
-    if path == '/watched/':
-        pass
-    elif path == '/to-watch/':
-        pass
     
     if request.method == 'POST':
         genre = request.POST.get('genre')
-        if not genre:
+        if not genre or genre == 'все жанры':
             if path == '/watched/':
                 context['list_of_films'] = Film.objects.filter(
                     ~Q(rating=0)
@@ -90,6 +86,7 @@ def film_list(request: HttpRequest):
                 )
                 context['title'] = 'Запланировано к просмотру'
 
+        context['list_type'] = '_'.join(path.strip('/').split('-'))
         return render(request, 'films/films_list.html', context=context)
 
     if path == '/watched/':
@@ -99,6 +96,7 @@ def film_list(request: HttpRequest):
         context['list_of_films'] = Film.objects.filter(Q(rating=0))
         context['title'] = 'Запланировано к просмотру'
 
+    context['list_type'] = '_'.join(path.strip('/').split('-'))
     return render(
         request, 
         'films/films_list.html', 
@@ -115,11 +113,13 @@ def film_page(request: HttpRequest, film_id: int):
     '''
 
     try:
+        back_list = request.GET.get('from')
         film = Film.objects.get(id=film_id)
         context = {
             'current_film': film,
             'title': film.name,
-            'menu': menu
+            'menu': menu,
+            'back_list': back_list
         }
         return render(
             request, 
@@ -142,7 +142,8 @@ def add_film(request: HttpRequest):
     context = {
         'menu': menu, 
         'title': 'Добавить фильм',
-        'genres': genres
+        'genres': genres,
+        'back_list': None
     }
 
     if request.method == 'POST' and request.FILES:

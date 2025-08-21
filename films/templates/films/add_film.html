@@ -14,46 +14,42 @@
             {% csrf_token %}
             <div class="form-error">{{ form.non_field_errors }}</div>
 
-            <!-- Название -->
             <div class="mb-3">
               <label class="form-label">{{ form.name.label }}</label>
               {% render_field form.name class="form-control" placeholder="Введите название" %}
               <div class="form-error text-danger small">{{ form.name.errors }}</div>
             </div>
 
-            <!-- Жанр -->
             <div class="mb-3">
               <label class="form-label">{{ form.genre.label }}</label>
               <select class="form-select" name="genre" id="genre">
                   {% for genre in genres %}
-                      <option value="{{ genre }}">{{ genre }}</option>
+                      {% if genre != 'все жанры' %}
+                        <option value="{{ genre }}">{{ genre }}</option>
+                      {% endif %}
                   {% endfor %}
               </select>
               <div class="form-error text-danger small">{{ form.genre.errors }}</div>
             </div>
 
-            <!-- Описание -->
             <div class="mb-3">
               <label class="form-label">{{ form.annotation.label }}</label>
               {% render_field form.annotation class="form-control" rows="5" %}
               <div class="form-error text-danger small">{{ form.annotation.errors }}</div>
             </div>
 
-            <!-- Рейтинг -->
             <div class="mb-3">
               <label class="form-label">{{ form.rating.label }}</label>
               {% render_field form.rating class="form-control" %}
               <div class="form-error text-danger small">{{ form.rating.errors }}</div>
             </div>
 
-            <!-- Постер -->
             <div class="mb-3">
               <label class="form-label">{{ form.poster.label }}</label>
               {% render_field form.poster class="form-control" %}
               <div class="form-error text-danger small">{{ form.poster.errors }}</div>
             </div>
 
-            <!-- Кнопка -->
             <div class="text-center">
               <button type="submit" class="btn btn-primary px-4">Сохранить</button>
             </div>

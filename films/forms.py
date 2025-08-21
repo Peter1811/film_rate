@@ -3,6 +3,7 @@ from django import forms
 from .models import Film
 
 genres = [
+    'все жанры',
     'боевик', 
     'комедия', 
     'ужасы', 

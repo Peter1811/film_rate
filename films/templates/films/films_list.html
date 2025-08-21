@@ -2,24 +2,23 @@
 {% block content %}
     <body>
     <h1 class="text-center text-primary mt-5">{{ title }}</h1>
-    <!-- <h2>Выберите жанр</h2> -->
+     <div class="ms-5">
     <form method="post">
         {% csrf_token %}
         <h2>Здесь можно выбрать жанр (если не выбран - будут отображены все фильмы)</h2>
         <div class="d-flex align-items-center gap-2 mb-3">
             <select class="form-select d-inline-block w-auto" name="genre" id="genre">
-            <option value="" disabled {% if not form.genre.value %}selected{% endif %}>-- Выберите жанр --</option>
             {% for genre in genres %}
-                <option value="{{ genre }}">{{ genre }}</option>
+                <option value="{{ genre }}" {% if genre == requested_genre %}selected{% endif %}>
+                  {{ genre }}
+              </option>
             {% endfor %}
             </select>
             <button type="submit" class="btn btn-primary px-4">Отфильтровать</button>
         </div>
         <div class="form-error">{{ field.errors }}</div>
     </form>
-    {% if requested_genre %}
-        <h3>Жанр: {{ requested_genre.lower }}</h3>
-    {% endif %}
+    </div>
     <div class="container my-4">
   <div class="row g-4">
     {% for film in list_of_films %}
