@@ -1,0 +1,28 @@
+services:
+
+  web:
+    build: .
+    command: python manage.py runserver localhost:8000
+    ports:
+      - 8000:8000
+    depends_on:
+      - pgdb
+
+  pgdb:
+    image: postgres:latest
+    shm_size: 128mb
+    restart: always
+    container_name: pgdb
+    volumes:
+      - type: tmpfs
+        target: /dev/shm
+        tmpfs:
+          size: 134217728 # 128*2^20 bytes = 128Mb
+
+    environment:
+      POSTGRES_DB: "habrdb"
+      POSTGRES_USER: "habrpguser"
+      POSTGRES_PASSWORD: "pgpwd4habr"
+
+    ports:
+      - "5432:5432"
